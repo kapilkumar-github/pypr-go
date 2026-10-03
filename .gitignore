@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+
+bin/
+tmp/
+
+# Go
+*.exe
+*.test
+*.out
+
+# IDE
+.idea/
+.vscode/
