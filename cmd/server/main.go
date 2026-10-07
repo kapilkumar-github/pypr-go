@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 	"uuid"
 
@@ -96,9 +97,12 @@ func NewApp(ctx context.Context) (*App, error) {
 func NewServer(app *App) *Server {
 	router := gin.New()
 	router.RedirectTrailingSlash = false
+	corsOrigins := strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
+	for i := range corsOrigins {
+		corsOrigins[i] = strings.TrimSpace(corsOrigins[i])
+	}
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"https://staging.pypr.work",
-			"https://pypr.work", "http://localhost:3000"},
+		AllowOrigins:     corsOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
@@ -130,10 +134,15 @@ func NewServer(app *App) *Server {
 	sequenceHandler := sequence.NewSequenceHandler(sequenceService)
 	sequenceHandler.RegisterRoutes(protected)
 
+	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	return &Server{
 		Router: router,
 		HTTP: &http.Server{
-			Addr:    ":8080",
+			Addr:    ":" + port,
 			Handler: router,
 		},
 	}
