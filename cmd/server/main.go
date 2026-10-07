@@ -142,7 +142,7 @@ func NewServer(app *App) *Server {
 	return &Server{
 		Router: router,
 		HTTP: &http.Server{
-			Addr:    ":" + port,
+			Addr:    "127.0.0.1:" + port,
 			Handler: router,
 		},
 	}
